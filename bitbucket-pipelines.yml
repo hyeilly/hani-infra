@@ -1,0 +1,41 @@
+image: node:16.17.0
+pipelines:
+  branches:
+    master:
+      - step:
+          name: settings
+          script:
+            - echo "start"
+      - parallel:
+          - step:
+              name: ServerIP-Port Deploy
+              script:
+                - pipe: atlassian/rsync-deploy:0.8.1
+                  variables:
+                    USER: $USER
+                    SERVER: $SERVER1
+                    REMOTE_PATH: $PROJECT_PATH
+                    LOCAL_PATH: "${BITBUCKET_CLONE_DIR}/"
+      - parallel:
+          - step:
+              name: make env file use shell script
+              script:
+                - pipe: atlassian/ssh-run:0.4.1
+                  variables:
+                    SSH_USER: $USER
+                    SERVER: $SERVER1
+                    COMMAND: $SH_PATH
+                    ENV_VARS: >-
+                      API_ENDPOINT=${API_ENDPOINT}
+      - parallel:
+          - step:
+              name: ServerIP-Port Deploy Project Build
+              script:
+                - pipe: atlassian/ssh-run:0.4.1
+                  variables:
+                    SSH_USER: $USER
+                    SERVER: $REAL_SERVER_1
+                    COMMAND: $SH_PATH
+definitions:
+  caches:
+    nextcache: .next/cache
