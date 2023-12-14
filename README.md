@@ -1,4 +1,8 @@
 # hani-infra
 hani-infra settings
 
-## FrontEnd Server
+# Environment
+- Nginx
+- PM2
+- Nodejs
+- Next.js

@@ -24,7 +24,7 @@ pipelines:
                   variables:
                     SSH_USER: $USER
                     SERVER: $SERVER1
-                    COMMAND: $SH_PATH
+                    COMMAND: $SH_PATH/makeEvn.sh
                     ENV_VARS: >-
                       API_ENDPOINT=${API_ENDPOINT}
       - parallel:
@@ -35,7 +35,7 @@ pipelines:
                   variables:
                     SSH_USER: $USER
                     SERVER: $REAL_SERVER_1
-                    COMMAND: $SH_PATH
+                    COMMAND: $SH_PATH/exec.sh
 definitions:
   caches:
     nextcache: .next/cache
