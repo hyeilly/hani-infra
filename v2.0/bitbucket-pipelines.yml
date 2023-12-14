@@ -1,11 +1,25 @@
+# Template PHP Build
+
+# This template allows you to validate your PHP application.
+# The workflow allows running tests and code linting on the default branch.
+
 image: node:16.17.0
+
 pipelines:
   branches:
     master:
       - step:
-          name: settings
+          name: 빌드 & env 파일 설정
+          artifacts:
+            - .next/**
+            - .env.production
+            - node_modules/**
+            - public/**
           script:
-            - echo "start"
+            - touch .env.production
+            - echo NEXT_PUBLIC_ENDPOINT=${API_ENDPOINT} >> .env.production
+            - npm install
+            - npm run build
       - parallel:
           - step:
               name: ServerIP-Port Deploy
@@ -16,26 +30,17 @@ pipelines:
                     SERVER: $SERVER1
                     REMOTE_PATH: $PROJECT_PATH
                     LOCAL_PATH: "${BITBUCKET_CLONE_DIR}/"
+
       - parallel:
           - step:
-              name: make env file use shell script
-              script:
-                - pipe: atlassian/ssh-run:0.4.1
-                  variables:
-                    SSH_USER: $USER
-                    SERVER: $SERVER1
-                    COMMAND: $SH_PATH/makeEvn.sh
-                    ENV_VARS: >-
-                      API_ENDPOINT=${API_ENDPOINT}
-      - parallel:
-          - step:
-              name: ServerIP-Port Deploy Project Build
+              name: use shell script
               script:
                 - pipe: atlassian/ssh-run:0.4.1
                   variables:
                     SSH_USER: $USER
                     SERVER: $SERVER1
                     COMMAND: $SH_PATH/exec.sh
+
 definitions:
   caches:
     nextcache: .next/cache
